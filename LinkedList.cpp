@@ -1,18 +1,18 @@
 #include <iostream>
 using namespace std;
 template <class T>
-struct Item {
+struct L1Item {
 	T data;
-	Item* link;
-	Item(): data(0), link(NULL) {}
-	Item(T& a) {
+	L1Item* link;
+	L1Item(): data(0), link(NULL) {}
+	L1Item(T& a) {
 		data = a;
 		link = NULL;
 	}
 };
 template <class T>
 class L1List{
-	Item<T>* head;
+	L1Item<T>* head;
 	size_t _size;
 public:
 	L1List() : head(NULL), _size(0) {}
@@ -52,14 +52,14 @@ public:
 template <class T>
 int L1List<T>::push_back(T &a) {
 	try {
-		Item<T>* temp = new Item<T>(a);
+		L1Item<T>* temp = new L1Item<T>(a);
 		if (head == NULL) {
 			temp->link = head;
 			head = temp;
 			_size++;
 		}
 		else {
-			Item<T>* p = new Item<T>;
+			L1Item<T>* p = new L1Item<T>;
 			p = head;
 			while (p->link != NULL) {
 				p = p->link;
@@ -77,7 +77,7 @@ int L1List<T>::push_back(T &a) {
 template <class T>
 int L1List<T>::insert(int i,T& a) {
 	try {
-		Item<T>* temp = new Item<T>(a);
+		L1Item<T>* temp = new L1Item<T>(a);
 		if (i == 0) {
 			if (head != NULL) temp->link = head;
 			head = temp;
@@ -85,7 +85,7 @@ int L1List<T>::insert(int i,T& a) {
 			return 0;
 		}
 		else {
-			Item<T>* p = head;
+			L1Item<T>* p = head;
 			int index = 0;
 			while (index + 1 < _size && index + 1 != i) {
 				p = p->link;
@@ -108,7 +108,7 @@ int L1List<T>::insert(int i,T& a) {
 template <class T>
 int L1List<T>::removeHead() {
 	try {
-		Item<T>* p = head;
+		L1Item<T>* p = head;
 		head = head->link;
 		delete p;
 		_size--;
@@ -122,7 +122,7 @@ int L1List<T>::removeHead() {
 template <class T>
 int L1List<T>::removeLast() {
 	try {
-		Item<T>* p = head;
+		L1Item<T>* p = head;
 		while (p->link->link != NULL) {
 			p = p->link;
 		}
@@ -139,7 +139,7 @@ int L1List<T>::removeLast() {
 template <class T>
 int L1List<T>::insertHead(T& a) {
 	try {
-		Item<T>* temp = new Item<T>(a);
+		L1Item<T>* temp = new L1Item<T>(a);
 		if (head != NULL)
 			temp->link = head;
 		head = temp;
@@ -150,10 +150,30 @@ int L1List<T>::insertHead(T& a) {
 	}
 }
 
+template <class T>
+int L1List<T>::remove(int i) {
+	L1Item<T>* temp = head;
+	int index = 0;
+	while (index + 1 != i && index < _size - 1) {
+		index++;
+		temp = temp->link;
+	}
+	if (index == i - 1) {
+		L1Item<T>* p = temp->link;
+		temp->link = temp->link->link;
+		p = NULL;
+		delete p;
+		_size--;
+		return 0;
+	}
+	else {
+		return -1;
+	}
+}
 
 template <class T>
 bool L1List<T>::find(T& a, int& idx) {
-	Item<T>* p = head;
+	L1Item<T>* p = head;
 	int index = 0;
 	while (index < _size && p->data != a) {
 		p = p->link;
@@ -168,7 +188,7 @@ bool L1List<T>::find(T& a, int& idx) {
 
 template <class T>
 T& L1List<T>::operator[](int i) {
-	Item<T>* p = head;
+	L1Item<T>* p = head;
 	int index = 0;
 	while (index < _size && i != index) {
 		p = p->link;
