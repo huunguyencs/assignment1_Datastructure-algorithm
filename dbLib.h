@@ -25,6 +25,11 @@
  /* TODO: Please design your data structure carefully so that you can work with the given dataset
   *       in this assignment. The below structures are just some suggestions.
   */
+struct Point {
+	double p1;
+	double p2;
+	Point() :p1(0), p2(0) {}
+};
 struct TCity {
 	// The structure to store city information
 	int city_id;
@@ -38,15 +43,22 @@ struct TLine:TCity {
 	TLine() : line_id(0) {}
 };
 
-struct TStation:TCity {
+struct TStation:TLine {
+	int station_id;
+	Point point;
+	TStation() : station_id(0) {}
+};
+struct TStation_name {
 	int station_id;
 	string station_name;
-	TStation() : station_id(0), station_name("") {}
+	TStation_name(): station_id(0), station_name("") {}
 };
 
-struct TTrack:TLine {
+struct TTrack:TStation {
 	// The structure to store track information
 	int track_id;
+	Point* point = new Point;
+	TTrack() :track_id(0) {}
 };
 
 class TDataset {
@@ -55,6 +67,7 @@ public:
 	L1List<TCity> pCity;
 	L1List<TLine> pLine;
 	L1List<TStation> pStation;
+	L1List<TStation_name> pStation_name;
 	L1List<TTrack> pTrack;
 	TDataset() {}
 	~TDataset() {}
