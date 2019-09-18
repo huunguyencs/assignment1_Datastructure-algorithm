@@ -47,17 +47,14 @@ void LoadData(void* &data) {
 #pragma endregion
 #pragma region LoadStation
 	TStation station;
-	FileIn.open("stations.csv", ios::in);
+	FileIn.open("station_lines.csv", ios::in);
 	getline(FileIn, temp);
 	while (!FileIn.eof()) {
 		getline(FileIn, temp, ',');
+		getline(FileIn, temp, ',');
 		station.station_id = atoi(temp.c_str());
 		getline(FileIn, temp, ',');
-		station.station_name = temp;
-		getline(FileIn, temp, ',');
-		getline(FileIn, temp, ',');
-		getline(FileIn, temp, ',');
-		getline(FileIn, temp, ',');
+		station.line_id = atoi(temp.c_str());
 		getline(FileIn, temp, ',');
 		station.city_id = atoi(temp.c_str());
 		getline(FileIn, temp);
@@ -65,6 +62,24 @@ void LoadData(void* &data) {
 	}
 	FileIn.close();
 #pragma endregion
+#pragma region LoadStation_name
+	TStation_name station_name;
+	FileIn.open("stations.csv", ios::in);
+	getline(FileIn, temp);
+	while (!FileIn.eof()) {
+		int idOfStation;
+		getline(FileIn, temp, ',');
+		station_name.station_id = atoi(temp.c_str());
+		getline(FileIn, temp, ',');
+		station_name.station_name = temp;
+		getline(FileIn, temp);
+		pData->pStation_name.push_back(station_name);
+	}
+	FileIn.close();
+#pragma endregion
+
+	
+
 
 	data = pData;
 	data = static_cast<TDataset*>(data);
