@@ -22,8 +22,10 @@ void Process_FC(TDataset* pData, void*& pOutput, string city_name, int& N);
 void Process_FS(TDataset* pData, void*& pOutput, string station_name, int& N);
 void Process_SLP(TDataset* pData, void*& pOutput, int station_id, int track_id, int& N);
 void Process_RS(TDataset* pData, void*& pOutput, int station_id, int& N);
-void Process_ISL(TDataset* pData, void*& pOutput, int station_id, int line_id, int index, int& N);
+void Process_ISL(TDataset* pData, void*& pOutput, int station_id, int line_id, int pos, int& N);
 void Process_RSL(TDataset* pData, void*& pOutput, int station_id, int line_id, int& N);
+void Process_IS(TDataset* pData, void*& pOutput, string decreption, int& N);
+void Process_US(TDataset* pData, void*& pOutput, int station_id, string decreption, int& N);
 void Initialization() {
 	// If you use global variables, please initialize them explicitly in this function.
 
@@ -41,7 +43,7 @@ void ProcessRequest(const char* pRequest, void* pData, void*& pOutput, int& N) {
 	//       pOutput is a pointer reference. It is set to nullptr and student must allocate data for it in order to save the required output
 	//       N is the size of output, must be a non-negative number
 	TDataset* data = (TDataset*)pData;
-	//Count line
+	//Đếm số lượng đường 
 	if (pRequest[0] == 'C' && pRequest[1] == 'L') {
 		int i = 2;
 		string city_name = "";
@@ -55,7 +57,7 @@ void ProcessRequest(const char* pRequest, void* pData, void*& pOutput, int& N) {
 		Process_CL(data, pOutput, city_name, N);
 		return;
 	}
-	//List the stations in the city
+	//Liệt kê các nhà ga có trong thành phố
 	if (pRequest[0] == 'L' && pRequest[1] == 'S' && pRequest[2] == 'C') {
 		int i = 4;
 		string city_name = "";
@@ -66,7 +68,7 @@ void ProcessRequest(const char* pRequest, void* pData, void*& pOutput, int& N) {
 		Process_LSC(data, pOutput, city_name, N);
 		return;
 	}
-	//List the lines in the city
+	//Liệt kê các đường trong thành phố
 	if (pRequest[0] == 'L' && pRequest[1] == 'L' && pRequest[2] == 'C') {
 		int i = 4;
 		string city_name = "";
@@ -77,7 +79,7 @@ void ProcessRequest(const char* pRequest, void* pData, void*& pOutput, int& N) {
 		Process_LLC(data, pOutput, city_name, N);
 		return;
 	}
-	//List the stations on line
+	//Liệt kê các nhà ga có trên đường
 	if (pRequest[0] == 'L' && pRequest[1] == 'S' && pRequest[2] == 'L') {
 		int i = 4;
 		string city_id_string = "";
@@ -89,7 +91,7 @@ void ProcessRequest(const char* pRequest, void* pData, void*& pOutput, int& N) {
 		Process_LSL(data, pOutput, city_id_int, N);
 		return;
 	}
-	//Find the city
+	//Tìm thành phố bằng tên
 	if (pRequest[0] == 'F' && pRequest[1] == 'C') {
 		int i = 3;
 		string city_name = "";
@@ -100,7 +102,7 @@ void ProcessRequest(const char* pRequest, void* pData, void*& pOutput, int& N) {
 		Process_FC(data, pOutput, city_name, N);
 		return;
 	}
-	//Find the station
+	//Liệt kê nhà ga trong nhà phố
 	if (pRequest[0] == 'F' && pRequest[1] == 'S') {
 		int i = 3;
 		string station_name = "";
@@ -111,7 +113,7 @@ void ProcessRequest(const char* pRequest, void* pData, void*& pOutput, int& N) {
 		Process_FS(data, pOutput, station_name, N);
 		return;
 	}
-	//Remove the station
+	//Xóa nhà ga khỏi dataset
 	if (pRequest[0] == 'R' && pRequest[1] == 'S' && pRequest[2]==' ') {
 		int i = 3;
 		string station_id_string = "";
@@ -122,15 +124,105 @@ void ProcessRequest(const char* pRequest, void* pData, void*& pOutput, int& N) {
 		int station_id_int = atoi(station_id_string.c_str());
 		Process_RS(data, pOutput, station_id_int, N);
 	}
+	//Tìm vị trí của nhà ga trong track
+	if (pRequest[0] == 'S' && pRequest[1] == 'L' && pRequest[2] == 'P') {
+		int i = 4;
+		string temp = "";
+		while (pRequest[i] != ' ') {
+			temp += pRequest[i];
+			i++;
+		}
+		int station_id = atoi(temp.c_str());
+		temp = "";
+		for (int j = i + 1; j < strlen(pRequest); j++) {
+			temp += pRequest[j];
+		}
+		int track_id = atoi(temp.c_str());
+		Process_SLP(data, pOutput, station_id, track_id, N);
+		return;
 
+	}
+	//Loại bỏ nhà ga khỏi đường
+	if (pRequest[0] == 'R' && pRequest[1] == 'S' && pRequest[2] == 'L') {
+		int i = 4;
+		string temp = "";
+		while (pRequest[i] != ' ') {
+			temp += pRequest[i];
+			i++;
+		}
+		int station_id = atoi(temp.c_str());
+		temp = "";
+		for (int j = i + 1; j < strlen(pRequest); j++) {
+			temp += pRequest[j];
+		}
+		int line_id = atoi(temp.c_str());
+		Process_RSL(data, pOutput, station_id, line_id, N);
+		return;
+	}
+	//Chèn nhà ga vào tập dữ liệu
+	if (pRequest[0] == 'I' && pRequest[1] == 'S' && pRequest[2] == ' ') {
+		int i = 3;
+		string decreption = "";
+		while (pRequest[i] != '\0') {
+			decreption += pRequest[i];
+			i++;
+		}
+		Process_IS(data, pOutput, decreption, N);
+		return;
+	}
+	//Chèn nhà ga vào đường
+	if (pRequest[0] == 'I' && pRequest[1] == 'S' && pRequest[2] == 'L') {
+		int i = 4;
+		string temp = "";
+		while (pRequest[i] != ' ') {
+			temp += pRequest[i];
+			i++;
+		}
+		i++;
+		int station_id = atoi(temp.c_str());
+		temp = "";
+		while (pRequest[i] != ' ') {
+			temp += pRequest[i];
+			i++;
+		}
+		i++;
+		int line_id = atoi(temp.c_str());
+		temp = "";
+		while (pRequest[i] != '\0') {
+			temp += pRequest[i];
+			i++;
+		}
+		int pos = atoi(temp.c_str());
+		Process_ISL(data, pOutput, station_id, line_id, pos, N);
+		return;
+	}
+	//Cập nhật thông tin nhà ga
+	if (pRequest[0] == 'U' && pRequest[1] == 'S') {
+		int i = 3;
+		string decreption = "";
+		while (pRequest[i] != ' ') {
+			decreption += pRequest[i];
+			i++;
+		}
+		i++;
+		int station_id = atoi(decreption.c_str());
+		decreption = "";
+		while (pRequest[i] != '\0') {
+			decreption += pRequest[i];
+			i++;
+		}
+		Process_US(data, pOutput, station_id, decreption, N);
+		return;
+	}
 }
 
+//Đếm số lượng đường 
 void Process_CL(TDataset* pData, void*& pOutput, string city_name, int& N) {
 	int* result = new int;
 	if (city_name == "") {
+		
 		N = 1;
 		int numOfLine = pData->pLine.getSize();
-		pOutput = new int;
 		result[0] = numOfLine;
 		pOutput = result;
 		return;
@@ -164,6 +256,7 @@ void Process_CL(TDataset* pData, void*& pOutput, string city_name, int& N) {
 		}
 	}
 }
+//Liệt kê các nhà ga có trong thành phố
 void Process_LSC(TDataset* pData, void*& pOutput, string city_name, int& N) {
 	int* station_id = new int[1000];
 	int idOfCity = 0;
@@ -175,16 +268,17 @@ void Process_LSC(TDataset* pData, void*& pOutput, string city_name, int& N) {
 		}
 	}
 	int index = 0;
-	int numOfStation = pData->pStation.getSize();
+	int numOfStation = pData->pStation_name.getSize();
 	for (int i = 0; i < numOfStation; i++) {
-		if (pData->pStation[i].city_id == idOfCity) {
-			station_id[index] = pData->pStation[i].station_id;
+		if (pData->pStation_name[i].city_id == idOfCity) {
+			station_id[index] = pData->pStation_name[i].station_id;
 			index++;
 		}
 	}
 	pOutput = station_id;
 	N = index - 1;
 }
+//Liệt kê các đường trong thành phố
 void Process_LLC(TDataset* pData, void*& pOutput, string city_name, int& N) {
 	int* line_id = new int[1000];
 	int idOfCity = 0;
@@ -206,6 +300,7 @@ void Process_LLC(TDataset* pData, void*& pOutput, string city_name, int& N) {
 	pOutput = line_id;
 	N = index - 1;
 }
+//Liệt kê các nhà ga có trên đường
 void Process_LSL(TDataset* pData, void*& pOutput, int line_id, int& N) {
 	int* idOfStation = new int[1000];
 	int index = 0;
@@ -219,6 +314,7 @@ void Process_LSL(TDataset* pData, void*& pOutput, int line_id, int& N) {
 	pOutput = idOfStation;
 	N = index - 1;
 }
+//Tìm thành phố bằng tên
 void Process_FC(TDataset* pData, void*& pOutput, string city_name, int& N) {
 	int* idOfCity = new int;
 	idOfCity[0] = -1;
@@ -232,6 +328,7 @@ void Process_FC(TDataset* pData, void*& pOutput, string city_name, int& N) {
 	pOutput = idOfCity;
 	N = 1;
 }
+//Tìm nhà ga bằng tên
 void Process_FS(TDataset* pData, void*& pOutput, string station_name, int& N) {
 	int* station_id = new int;
 	station_id[0] = -1;
@@ -245,29 +342,68 @@ void Process_FS(TDataset* pData, void*& pOutput, string station_name, int& N) {
 	pOutput = station_id;
 	N = 1;
 }
+//Tìm vị trí của nhà ga trong track
 void Process_SLP(TDataset* pData, void*& pOutput, int station_id, int track_id, int& N) {
-
+	int* result = new int;
+	result[0] = -1;
+	int numOfTrack = pData->pTrack.getSize();
+	int indexOfTrack = 0;
+	for (int i = 0; i < numOfTrack; i++) {
+		if (track_id == pData->pTrack[i].track_id) {
+			indexOfTrack = i;
+			break;
+		}
+	}
+	int indexOfStation = 0;
+	int numOfStation = pData->pStation_name.getSize();
+	for (int i = 0; i < numOfStation; i++) {
+		if (pData->pStation_name[i].station_id == station_id) {
+			indexOfStation = i;
+			break;
+		}
+	}
+	int i = 0;
+	while(pData->pTrack[indexOfTrack].point[i].p1!=0){
+		if (pData->pTrack[indexOfTrack].point[i].p1 == pData->pStation_name[indexOfStation].point.p1 && pData->pTrack[indexOfTrack].point[i].p2 == pData->pStation_name[indexOfStation].point.p2) {
+			result[0] = i;
+			break;
+		}
+		i++;
+	}
+	pOutput = result;
+	N = 1;
 }
+//Xóa nhà ga khỏi dataset
 void Process_RS(TDataset* pData, void*& pOutput, int station_id, int& N) {
 	int* result = new int;
 	try {
-		bool isSuccess = false;
+		bool isSuccess1 = false;
+		bool isSuccess2 = false;
 		int numOfStation = pData->pStation.getSize();
 		for (int i = 0; i < numOfStation; i++) {
 			if (pData->pStation[i].station_id == station_id) {
-				pData->pStation.remove(i);
+				if (i == 0) pData->pStation.removeHead();
+				else {
+					if (i == numOfStation - 1) if (pData->pStation.removeLast() == -1) { result[0] = -1; break; }
+					else if (pData->pStation.remove(i) == -1) { result[0] = -1; break; }
+				}
+				isSuccess1 = true;
 				break;
 			}
 		}
 		int numOfStation_name = pData->pStation_name.getSize();
 		for (int i = 0; i < numOfStation_name; i++) {
 			if (pData->pStation_name[i].station_id == station_id) {
-				pData->pStation_name.remove(i);
-				isSuccess = true;
+				if (i == 0) pData->pStation_name.removeHead();
+				else {
+					if (i == numOfStation_name - 1) if (pData->pStation_name.removeLast()==-1) { result[0] = -1; break; }
+					else if (pData->pStation_name.remove(i) == -1) { result[0] = -1; break; }
+				}
+				isSuccess2 = true;
 				break;
 			}
 		}
-		if (isSuccess) result[0] = 0;
+		if (isSuccess1 && isSuccess2) result[0] = 0;
 		else result[0] = -1;
 		pOutput = result;
 		N = 1;
@@ -280,6 +416,7 @@ void Process_RS(TDataset* pData, void*& pOutput, int station_id, int& N) {
 
 
 }
+//Loại bỏ nhà ga khỏi đường
 void Process_RSL(TDataset* pData, void*& pOutput, int station_id, int line_id, int& N) {
 	int* result = new int;
 	try
@@ -301,6 +438,57 @@ void Process_RSL(TDataset* pData, void*& pOutput, int station_id, int line_id, i
 	catch (exception)
 	{
 		result[0] = -1;
+		pOutput = result;
+		N = 1;
+	}
+}
+//Chèn nhà ga vào dataset
+void Process_IS(TDataset* pData, void*& pOutput, string decreption, int& N) {
+
+}
+//Chèn nhà ga vào đường
+void Process_ISL(TDataset* pData, void*& pOutput, int station, int line_id, int pos, int& N) {
+
+}
+//Cập nhật thông tin của nhà ga
+void Process_US(TDataset* pData, void*& pOutput, int station_id, string decreption, int& N) {
+	int* result = new int;
+	int numOfStation_name = pData->pStation_name.getSize();
+	int index = 0;
+	for (int i = 0; i < numOfStation_name; i++) {
+		if (station_id == pData->pStation_name[i].station_id) {
+			index = i;
+			break;
+		}
+	}
+	if (index == 0) {
+		result[0] = -1;
+		pOutput = result;
+		N = 1;
+	}
+	else {
+
+		string name_station = "";
+		int i = 0;
+		while (decreption[i] != ',') {
+			name_station += decreption[i];
+			i++;
+		}
+		pData->pStation_name[index].station_name = name_station;
+		while (decreption[i] != '(') {
+			i++;
+		}
+		i++;
+		string point = "";
+		while (decreption[i] != ')') {
+			point += decreption[i];
+			i++;
+		}
+		Point p;
+		p = creatPoint(point);
+		pData->pStation_name[index].point.p1 = p.p1;
+		pData->pStation_name[index].point.p2 = p.p2;
+		result[0] = 0;
 		pOutput = result;
 		N = 1;
 	}
