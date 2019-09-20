@@ -26,8 +26,8 @@
   *       in this assignment. The below structures are just some suggestions.
   */
 struct Point {
-	double p1;
-	double p2;
+	float p1;
+	float p2;
 	Point() :p1(0), p2(0) {}
 };
 struct TCity {
@@ -45,19 +45,20 @@ struct TLine:TCity {
 
 struct TStation:TLine {
 	int station_id;
-	Point point;
 	TStation() : station_id(0) {}
 };
-struct TStation_name {
+struct TStation_name:TCity {
 	int station_id;
 	string station_name;
+	Point point;
 	TStation_name(): station_id(0), station_name("") {}
 };
 
 struct TTrack:TStation {
 	// The structure to store track information
 	int track_id;
-	Point* point = new Point;
+	TStation_name station_name;
+	Point point[1000];
 	TTrack() :track_id(0) {}
 };
 
@@ -77,6 +78,7 @@ public:
 
 void LoadData(void*&);
 void ReleaseData(void*&);
-
+Point creatPoint(string p_string);
+void pointInTrack(string point_array,TTrack & track);
 #endif //DSA191_A1_DBLIB_H
 #pragma once
