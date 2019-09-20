@@ -1,6 +1,6 @@
 /* Created by Nguyen Duc Dung on 2019-09-03.
  * =========================================================================================
- * Name        : dbLib.cpp
+ * Name        : dbLib.h
  * Author      : Duc Dung Nguyen
  * Email       : nddung@hcmut.edu.vn
  * Copyright   : Faculty of Computer Science and Engineering - HCMUT
@@ -9,82 +9,76 @@
  * =========================================================================================
  */
 
-#include "dbLib.h"
+#ifndef DSA191_A1_DBLIB_H
+#define DSA191_A1_DBLIB_H
 
- /* TODO: You can implement methods, functions that support your data structures here.
-  * */
-void LoadData(void* &data) {
-	TDataset* pData = new TDataset;
-#pragma region LoadLine
-	TLine line;
-	fstream FileIn;
-	FileIn.open("lines.csv", ios::in);
-	string temp;
-	getline(FileIn, temp);
-	while (!FileIn.eof()) {
-		getline(FileIn, temp, ',');
-		line.line_id = atoi(temp.c_str());
-		getline(FileIn, temp, ',');
-		line.city_id = atoi(temp.c_str());
-		getline(FileIn, temp);
-		pData->pLine.push_back(line);
-	}
-	FileIn.close();
-#pragma endregion
-#pragma region LoadCity
-	TCity city;
-	FileIn.open("cities.csv", ios::in);
-	getline(FileIn, temp);
-	while (!FileIn.eof()) {
-		getline(FileIn, temp, ',');
-		city.city_id = atoi(temp.c_str());
-		getline(FileIn, temp, ',');
-		city.city_name = temp;
-		getline(FileIn, temp);
-		pData->pCity.push_back(city);
-	}
-	FileIn.close();
-#pragma endregion
-#pragma region LoadStation
-	TStation station;
-	FileIn.open("station_lines.csv", ios::in);
-	getline(FileIn, temp);
-	while (!FileIn.eof()) {
-		getline(FileIn, temp, ',');
-		getline(FileIn, temp, ',');
-		station.station_id = atoi(temp.c_str());
-		getline(FileIn, temp, ',');
-		station.line_id = atoi(temp.c_str());
-		getline(FileIn, temp, ',');
-		station.city_id = atoi(temp.c_str());
-		getline(FileIn, temp);
-		pData->pStation.push_back(station);
-	}
-	FileIn.close();
-#pragma endregion
-#pragma region LoadStation_name
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <string>
+#include <cstring>
+#include <sstream>
+#include <math.h>
+
+#include "dsaLib.h"
+
+ /* TODO: Please design your data structure carefully so that you can work with the given dataset
+  *       in this assignment. The below structures are just some suggestions.
+  */
+struct Point {
+	float p1;
+	float p2;
+	Point() :p1(0), p2(0) {}
+};
+struct TCity {
+	// The structure to store city information
+	int city_id;
+	string city_name;
+	TCity() : city_id(0), city_name("") {}
+};
+
+struct TLine:TCity {
+	// The structure to store line information
+	int line_id;
+	TLine() : line_id(0) {}
+};
+
+struct TStation:TLine {
+	int station_id;
+	TStation() : station_id(0) {}
+};
+struct TStation_name:TCity {
+	int station_id;
+	string station_name;
+	Point point;
+	TStation_name(): station_id(0), station_name("") {}
+};
+
+struct TTrack:TStation {
+	// The structure to store track information
+	int track_id;
 	TStation_name station_name;
-	FileIn.open("stations.csv", ios::in);
-	getline(FileIn, temp);
-	while (!FileIn.eof()) {
-		int idOfStation;
-		getline(FileIn, temp, ',');
-		station_name.station_id = atoi(temp.c_str());
-		getline(FileIn, temp, ',');
-		station_name.station_name = temp;
-		getline(FileIn, temp);
-		pData->pStation_name.push_back(station_name);
-	}
-	FileIn.close();
-#pragma endregion
+	Point point[1000];
+	TTrack() :track_id(0) {}
+};
 
-	
+class TDataset {
+	// This class can be a container that help you manage your tables
+public:
+	L1List<TCity> pCity;
+	L1List<TLine> pLine;
+	L1List<TStation> pStation;
+	L1List<TStation_name> pStation_name;
+	L1List<TTrack> pTrack;
+	TDataset() {}
+	~TDataset() {}
+};
 
+// Please add more or modify as needed
 
-	data = pData;
-	data = static_cast<TDataset*>(data);
-}
-
-void ReleaseData(void*& data) {
-	delete data;
-}
+void LoadData(void*&);
+void ReleaseData(void*&);
+Point creatPoint(string p_string);
+void pointInTrack(string point_array,TTrack & track);
+#endif //DSA191_A1_DBLIB_H
+#pragma once
