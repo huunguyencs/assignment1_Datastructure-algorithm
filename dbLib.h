@@ -45,13 +45,14 @@ struct TLine:TCity {
 
 struct TStation:TLine {
 	int station_id;
-	TStation() : station_id(0) {}
+	int id;
+	TStation() : station_id(0), id(0) {}
 };
 struct TStation_name:TCity {
-	int station_id;
+	int id;
 	string station_name;
 	Point point;
-	TStation_name(): station_id(0), station_name("") {}
+	TStation_name(): id(0), station_name("") {}
 };
 
 struct TTrack:TStation {
