@@ -43,6 +43,7 @@ void ProcessRequest(const char* pRequest, void* pData, void*& pOutput, int& N) {
 	//       pOutput is a pointer reference. It is set to nullptr and student must allocate data for it in order to save the required output
 	//       N is the size of output, must be a non-negative number
 	TDataset* data = (TDataset*)pData;
+	cout << data->pStation_name[490].station_name << endl;
 	//Đếm số lượng đường 
 	if (pRequest[0] == 'C' && pRequest[1] == 'L') {
 		int i = 2;
@@ -219,7 +220,8 @@ void ProcessRequest(const char* pRequest, void* pData, void*& pOutput, int& N) {
 //Đếm số lượng đường 
 void Process_CL(TDataset* pData, void*& pOutput, string city_name, int& N) {
 	int* result = new int;
-	if (city_name == "") {
+	//Dem so luong duong trong tap du lieu
+	if (city_name == "") { 
 		
 		N = 1;
 		int numOfLine = pData->pLine.getSize();
@@ -227,17 +229,18 @@ void Process_CL(TDataset* pData, void*& pOutput, string city_name, int& N) {
 		pOutput = result;
 		return;
 	}
-	else {
+	else { //Dem so luong duong voi ten thanh pho duoc dua
 		int count = -1;
 		int idOfCity = 0;
 		int numOfCity = (int)pData->pCity.getSize();
+		//Tim chi so thanh pho bang ten thanh pho
 		for (int i = 0; i < numOfCity; i++) {
 			if (pData->pCity[i].city_name == city_name) {
 				idOfCity = pData->pCity[i].city_id;
 				break;
 			}
 		}
-		if (idOfCity == 0) {
+		if (idOfCity == 0) { //Khong tim thay thanh pho
 			N = 1;
 			result[0] = count;
 			pOutput = result;
@@ -247,7 +250,7 @@ void Process_CL(TDataset* pData, void*& pOutput, string city_name, int& N) {
 			count = 0;
 			int numOfLine = (int)pData->pLine.getSize();
 			for (int i = 0; i < numOfLine; i++) {
-				if (pData->pLine[i].city_id == idOfCity) count++;
+				if (pData->pLine[i].city_id == idOfCity) count++; //Dem so luong duong trong thanh pho
 			}
 			N = 1;
 			result[0] = count;
@@ -258,9 +261,10 @@ void Process_CL(TDataset* pData, void*& pOutput, string city_name, int& N) {
 }
 //Liệt kê các nhà ga có trong thành phố
 void Process_LSC(TDataset* pData, void*& pOutput, string city_name, int& N) {
-	int* station_id = new int[1000];
+	int* station_id = new int[1000]; 
 	int idOfCity = 0;
 	int numOfCity = (int)pData->pCity.getSize();
+	//Tim chi so thanh pho bang ten duoc dua
 	for (int i = 0; i < numOfCity; i++) {
 		if (pData->pCity[i].city_name == city_name) {
 			idOfCity = pData->pCity[i].city_id;
@@ -268,10 +272,11 @@ void Process_LSC(TDataset* pData, void*& pOutput, string city_name, int& N) {
 		}
 	}
 	int index = 0;
-	int numOfStation = pData->pStation_name.getSize();
+	int numOfStation = pData->pStation.getSize();
+	//Kiem tra nha ga co thuoc thanh pho hay khong
 	for (int i = 0; i < numOfStation; i++) {
-		if (pData->pStation_name[i].city_id == idOfCity) {
-			station_id[index] = pData->pStation_name[i].station_id;
+		if (pData->pStation[i].city_id == idOfCity) {
+			station_id[index] = pData->pStation[i].station_id;
 			index++;
 		}
 	}
@@ -283,6 +288,7 @@ void Process_LLC(TDataset* pData, void*& pOutput, string city_name, int& N) {
 	int* line_id = new int[1000];
 	int idOfCity = 0;
 	int numOfCity = (int)pData->pCity.getSize();
+	//Tim chi so thanh pho bang ten
 	for (int i = 0; i < numOfCity; i++) {
 		if (pData->pCity[i].city_name == city_name) {
 			idOfCity = pData->pCity[i].city_id;
@@ -291,6 +297,7 @@ void Process_LLC(TDataset* pData, void*& pOutput, string city_name, int& N) {
 	}
 	int index = 0;
 	int numOfLine = pData->pLine.getSize();
+	//Kiem tra xem duong co thuoc thanh pho hay khong
 	for (int i = 0; i < numOfLine; i++) {
 		if (pData->pLine[i].city_id == idOfCity) {
 			line_id[index] = pData->pLine[i].line_id;
@@ -305,6 +312,7 @@ void Process_LSL(TDataset* pData, void*& pOutput, int line_id, int& N) {
 	int* idOfStation = new int[1000];
 	int index = 0;
 	int numOfStation = pData->pStation.getSize();
+	//Kiem tra nha ga co thuoc duong hay khong
 	for (int i = 0; i < numOfStation; i++) {
 		if (pData->pStation[i].line_id == line_id) {
 			idOfStation[index] = pData->pStation[i].station_id;
@@ -319,6 +327,7 @@ void Process_FC(TDataset* pData, void*& pOutput, string city_name, int& N) {
 	int* idOfCity = new int;
 	idOfCity[0] = -1;
 	int numOfCity = pData->pCity.getSize();
+	//Kiem tra xem ten thanh pho co trung khong
 	for (int i = 0; i < numOfCity; i++) {
 		if (city_name == pData->pCity[i].city_name) {
 			idOfCity[0] = pData->pCity[i].city_id;
@@ -332,10 +341,20 @@ void Process_FC(TDataset* pData, void*& pOutput, string city_name, int& N) {
 void Process_FS(TDataset* pData, void*& pOutput, string station_name, int& N) {
 	int* station_id = new int;
 	station_id[0] = -1;
+	int idInStation = 0;
 	int numOfStation_name = pData->pStation_name.getSize();
+	//Tim chi so station thong qua ten nha ga
 	for (int i = 0; i < numOfStation_name; i++) {
 		if (station_name == pData->pStation_name[i].station_name) {
-			station_id[0] = pData->pStation_name[i].station_id;
+			idInStation = pData->pStation_name[i].id;
+			break;
+		}
+	}
+	//Kiem tra xem chi so station co trung khong
+	int numOfStation = pData->pStation.getSize();
+	for (int i = 0; i < numOfStation; i++) {
+		if (idInStation == pData->pStation[i].id) {
+			station_id[0] = pData->pStation[i].station_id;
 			break;
 		}
 	}
@@ -348,21 +367,33 @@ void Process_SLP(TDataset* pData, void*& pOutput, int station_id, int track_id, 
 	result[0] = -1;
 	int numOfTrack = pData->pTrack.getSize();
 	int indexOfTrack = 0;
+	//Tim chi so track thong qua track_id
 	for (int i = 0; i < numOfTrack; i++) {
 		if (track_id == pData->pTrack[i].track_id) {
 			indexOfTrack = i;
 			break;
 		}
 	}
+	int idInStation = 0;
 	int indexOfStation = 0;
-	int numOfStation = pData->pStation_name.getSize();
+	int numOfStation = pData->pStation.getSize();
+	//Tim chi so cua station thong qua station_id
 	for (int i = 0; i < numOfStation; i++) {
-		if (pData->pStation_name[i].station_id == station_id) {
+		if (pData->pStation[i].station_id == station_id) {
+			idInStation = pData->pStation[i].id;
+			break;
+		}
+	}
+	int numOfStation_name = pData->pStation_name.getSize();
+	//Kiem tra xem chi so cua station co trung khong
+	for (int i = 0; i < numOfStation_name; i++) {
+		if (pData->pStation_name[i].id = idInStation) {
 			indexOfStation = i;
 			break;
 		}
 	}
 	int i = 0;
+	//Tim chi so cua station trong 1 track thong qua point
 	while(pData->pTrack[indexOfTrack].point[i].p1!=0){
 		if (pData->pTrack[indexOfTrack].point[i].p1 == pData->pStation_name[indexOfStation].point.p1 && pData->pTrack[indexOfTrack].point[i].p2 == pData->pStation_name[indexOfStation].point.p2) {
 			result[0] = i;
@@ -377,11 +408,14 @@ void Process_SLP(TDataset* pData, void*& pOutput, int station_id, int track_id, 
 void Process_RS(TDataset* pData, void*& pOutput, int station_id, int& N) {
 	int* result = new int;
 	try {
+		int idInStation = -1;
 		bool isSuccess1 = false;
 		bool isSuccess2 = false;
 		int numOfStation = pData->pStation.getSize();
+		//Xoa nha ga khoi station
 		for (int i = 0; i < numOfStation; i++) {
 			if (pData->pStation[i].station_id == station_id) {
+				idInStation = pData->pStation[i].id; //Lay chi so cua station de xoa nha ga trong station_name
 				if (i == 0) pData->pStation.removeHead();
 				else {
 					if (i == numOfStation - 1) if (pData->pStation.removeLast() == -1) { result[0] = -1; break; }
@@ -392,8 +426,9 @@ void Process_RS(TDataset* pData, void*& pOutput, int station_id, int& N) {
 			}
 		}
 		int numOfStation_name = pData->pStation_name.getSize();
+		//Xoa nha ga khoi station_name
 		for (int i = 0; i < numOfStation_name; i++) {
-			if (pData->pStation_name[i].station_id == station_id) {
+			if (pData->pStation_name[i].id == idInStation) {
 				if (i == 0) pData->pStation_name.removeHead();
 				else {
 					if (i == numOfStation_name - 1) if (pData->pStation_name.removeLast()==-1) { result[0] = -1; break; }
@@ -403,7 +438,7 @@ void Process_RS(TDataset* pData, void*& pOutput, int station_id, int& N) {
 				break;
 			}
 		}
-		if (isSuccess1 && isSuccess2) result[0] = 0;
+		if (isSuccess1 && isSuccess2 && idInStation!=-1) result[0] = 0;
 		else result[0] = -1;
 		pOutput = result;
 		N = 1;
@@ -423,8 +458,9 @@ void Process_RSL(TDataset* pData, void*& pOutput, int station_id, int line_id, i
 	{
 		bool isSuccess = false;
 		int numOfStation = pData->pStation.getSize();
+		//Kiem tra xem nha ga co thuoc duong khong
 		for (int i = 0; i < numOfStation; i++) {
-			if (pData->pStation[i].line_id == line_id) {
+			if (pData->pStation[i].line_id == line_id && pData->pStation[i].station_id==station_id) {
 				pData->pStation.remove(i);
 				isSuccess = true;
 				break;
@@ -447,21 +483,71 @@ void Process_IS(TDataset* pData, void*& pOutput, string decreption, int& N) {
 
 }
 //Chèn nhà ga vào đường
-void Process_ISL(TDataset* pData, void*& pOutput, int station, int line_id, int pos, int& N) {
-
+void Process_ISL(TDataset* pData, void*& pOutput, int station_id, int line_id, int pos, int& N) {
+	int* result = new int;
+	TStation station;
+	station.station_id = station_id;
+	station.line_id = line_id;
+	int index = 0;
+	int indexInsert = 0;
+	int numOfStation = pData->pStation.getSize();
+	//Kiem tra xem da ton tai nha ga tren duong chua
+	for (int i = 0; i < numOfStation; i++) {
+		if (pData->pStation[i].line_id == line_id) {
+			if (pData->pStation[i].station_id == station_id) {
+				result[0] = -1;
+				pOutput = result;
+				N = 1;
+				return;
+			}
+		}
+	}
+	//Tim vi tri de chen nha ga vao
+	for (int i = 0; i < numOfStation; i++) {
+		if (index == pos) {
+			indexInsert = i;
+			break;
+		}
+		if (pData->pStation[i].line_id == line_id) index++;
+	}
+	
+	if (pos == 0) pData->pStation.insertHead(station); //Chen vao dau
+	else {
+		if (index == 0 && indexInsert == 0) { //Neu khong tim duoc vi tri
+			result[0] = -1;
+			pOutput = result;
+			N = 1;
+		}
+		else {
+			pData->pStation.insert(indexInsert, station);
+			result[0] = 0;
+			pOutput = result;
+			N = 1;
+		}
+	}
 }
 //Cập nhật thông tin của nhà ga
 void Process_US(TDataset* pData, void*& pOutput, int station_id, string decreption, int& N) {
 	int* result = new int;
-	int numOfStation_name = pData->pStation_name.getSize();
+	int numOfStation = pData->pStation.getSize();
 	int index = 0;
+	int idOfStation = -1;
+	bool isFound = false;
+	for (int i = 0; i < numOfStation; i++) {
+		if (station_id == pData->pStation[i].station_id) {
+			idOfStation = i;
+			isFound = true;
+			break;
+		}
+	}
+	int numOfStation_name = pData->pStation_name.getSize();
 	for (int i = 0; i < numOfStation_name; i++) {
-		if (station_id == pData->pStation_name[i].station_id) {
+		if (pData->pStation_name[i].id = idOfStation) {
 			index = i;
 			break;
 		}
 	}
-	if (index == 0) {
+	if (!isFound) {
 		result[0] = -1;
 		pOutput = result;
 		N = 1;
