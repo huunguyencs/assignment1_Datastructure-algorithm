@@ -51,10 +51,13 @@ void LoadData(void* &data) {
 	getline(FileIn, temp);
 	while (!FileIn.eof()) {
 		getline(FileIn, temp, ',');
+		station.id = atoi(temp.c_str());
 		getline(FileIn, temp, ',');
 		station.station_id = atoi(temp.c_str());
 		getline(FileIn, temp, ',');
 		station.line_id = atoi(temp.c_str());
+		getline(FileIn, temp, ',');
+		station.city_id = atoi(temp.c_str());
 		getline(FileIn, temp);
 		pData->pStation.push_back(station);
 	}
@@ -67,9 +70,20 @@ void LoadData(void* &data) {
 	while (!FileIn.eof()) {
 		int idOfStation;
 		getline(FileIn, temp, ',');
-		station_name.station_id = atoi(temp.c_str());
+		station_name.id = atoi(temp.c_str());
 		getline(FileIn, temp, ',');
-		station_name.station_name = temp;
+		if (temp[0] == '\"') {
+			if (temp[temp.length() - 1] == '\"') {
+				for (int i = 1; i < temp.length() - 1; i++) station_name.station_name += temp[i];
+			}
+			else {
+				for (int i = 1; i < temp.length(); i++) station_name.station_name += temp[i];
+				station_name.station_name += ',';
+				getline(FileIn, temp, ',');
+				for(int i=0;i<temp.length() - 1;i++) station_name.station_name += temp[i];
+			}
+		}
+		else station_name.station_name = temp;
 		getline(FileIn, temp, '(');
 		getline(FileIn, temp, ')');
 		station_name.point = creatPoint(temp);
@@ -80,6 +94,7 @@ void LoadData(void* &data) {
 		getline(FileIn, temp);
 		station_name.city_id = atoi(temp.c_str());
 		pData->pStation_name.push_back(station_name);
+		station_name.station_name = "";
 	}
 	FileIn.close();
 #pragma endregion
