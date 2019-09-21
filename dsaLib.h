@@ -45,9 +45,7 @@ class L1List {
 	size_t      _size;// number of elements in this list
 public:
 	L1List() : _pHead(NULL), _size(0) {}
-	~L1List() {
-		
-	}
+	~L1List() {}
 
 	void    clean();
 	bool    isEmpty() {
@@ -91,7 +89,6 @@ int L1List<T>::push_back(T& a) {
 		if (_pHead == NULL) {
 			temp->pNext = _pHead;
 			_pHead = temp;
-			_size++;
 		}
 		else {
 			L1Item<T>* p = new L1Item<T>;
@@ -100,7 +97,7 @@ int L1List<T>::push_back(T& a) {
 				p = p->pNext;
 			}
 			p->pNext = temp;
-			_size++;
+			_size = _size + 1;
 		}
 		return 0;
 	}
@@ -138,7 +135,7 @@ template <class T>
 int L1List<T>::removeHead() {
 	// TODO: Your code goes here
 	try {
-		if (_pHead = NULL) return -1;
+		if (_pHead == NULL) return -1;
 		L1Item<T>* p = _pHead;
 		_pHead = _pHead->pNext;
 		delete p;
@@ -156,9 +153,9 @@ template <class T>
 int L1List<T>::removeLast() {
 	// TODO: Your code goes here
 	try {
-		if (_pHead = NULL) return -1;
+		if (_pHead == NULL) return -1;
 		L1Item<T>* p = _pHead;
-		while (p->link->link != NULL) {
+		while (p->pNext->pNext != NULL) {
 			p = p->pNext;
 		}
 		p->pNext = NULL;
@@ -170,6 +167,7 @@ int L1List<T>::removeLast() {
 		return -1;
 	}
 }
+
 template <class T>
 bool L1List<T>::find(T& a, int& idx) {
 	bool isFinded = false;
