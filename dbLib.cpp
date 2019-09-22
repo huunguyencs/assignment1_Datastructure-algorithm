@@ -113,11 +113,8 @@ void LoadData(void* &data) {
 	}
 #pragma endregion
 
-	
-
 
 	data = pData;
-	data = static_cast<TDataset*>(data);
 }
 
 void ReleaseData(void*& data) {
@@ -159,4 +156,5 @@ void pointInTrack(string point_array, TTrack& track) {
 		i++;
 	}
 }
+
 
