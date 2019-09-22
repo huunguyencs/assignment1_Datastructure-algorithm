@@ -26,8 +26,8 @@
   *       in this assignment. The below structures are just some suggestions.
   */
 struct Point {
-	float p1;
-	float p2;
+	double p1;
+	double p2;
 	Point() :p1(0), p2(0) {}
 };
 struct TCity {
