@@ -43,8 +43,7 @@ void ProcessRequest(const char* pRequest, void* pData, void*& pOutput, int& N) {
 	//       pOutput is a pointer reference. It is set to nullptr and student must allocate data for it in order to save the required output
 	//       N is the size of output, must be a non-negative number
 	TDataset* data = (TDataset*)pData;
-	cout << data->pStation_name[490].station_name << endl;
-	//Đếm số lượng đường 
+	//Đếm số lượng đường
 	if (pRequest[0] == 'C' && pRequest[1] == 'L') {
 		int i = 2;
 		string city_name = "";
@@ -395,7 +394,7 @@ void Process_SLP(TDataset* pData, void*& pOutput, int station_id, int track_id, 
 	int i = 0;
 	//Tim chi so cua station trong 1 track thong qua point
 	while(pData->pTrack[indexOfTrack].point[i].p1!=0){
-		if (pData->pTrack[indexOfTrack].point[i].p1 == pData->pStation_name[indexOfStation].point.p1 && pData->pTrack[indexOfTrack].point[i].p2 == pData->pStation_name[indexOfStation].point.p2) {
+		if (abs(pData->pTrack[indexOfTrack].point[i].p1 - pData->pStation_name[indexOfStation].point.p1)<0.00001 && abs(pData->pTrack[indexOfTrack].point[i].p2 - pData->pStation_name[indexOfStation].point.p2)<0.00001) {
 			result[0] = i;
 			break;
 		}
@@ -461,7 +460,11 @@ void Process_RSL(TDataset* pData, void*& pOutput, int station_id, int line_id, i
 		//Kiem tra xem nha ga co thuoc duong khong
 		for (int i = 0; i < numOfStation; i++) {
 			if (pData->pStation[i].line_id == line_id && pData->pStation[i].station_id==station_id) {
-				pData->pStation.remove(i);
+				if (i == 0) pData->pStation.removeHead();
+				else {
+					if (i == numOfStation - 1) pData->pStation.removeLast();
+					else pData->pStation.remove(i);
+				}
 				isSuccess = true;
 				break;
 			}
@@ -480,7 +483,61 @@ void Process_RSL(TDataset* pData, void*& pOutput, int station_id, int line_id, i
 }
 //Chèn nhà ga vào dataset
 void Process_IS(TDataset* pData, void*& pOutput, string decreption, int& N) {
+	int* result = new int;
+	TStation_name station_insert;
+	int numOfStation_name = pData->pStation_name.getSize();
+	int idMax = pData->pStation_name[0].id;
+	for (int i = 0; i < numOfStation_name; i++) {
+		if (idMax < pData->pStation_name[i].id) {
+			idMax = pData->pStation_name[i].id;
+		}
+	}
 
+	station_insert.id = idMax +1;
+	string temp = "";
+	int i = 0;
+	//Lay ten cua station
+	if (decreption[0] == '\"') {
+		i = 1;
+		while (decreption[i] != '\"') {
+			temp += decreption[i];
+			i++;
+		}
+		station_insert.station_name = temp;
+	}
+	else {
+		while (decreption[i] != ',') {
+			temp += decreption[i];
+			i++;
+		}
+		station_insert.station_name = temp;
+	}
+
+	temp = "";
+	while (decreption[i] != '(') {
+		i++;
+	}
+	i++;
+	while (decreption[i] != ')') {
+		temp += decreption[i];
+		i++;
+	}
+	Point point = creatPoint(temp);
+	station_insert.point.p1 = point.p1;
+	station_insert.point.p2 = point.p2;
+	pData->pStation_name.push_back(station_insert);
+	pData->pStation_name[pData->pStation_name.getSize() - 1].id = station_insert.id;
+	pData->pStation_name[pData->pStation_name.getSize() - 1].point = station_insert.point;
+	pData->pStation_name[pData->pStation_name.getSize() - 1].station_name = station_insert.station_name;
+	//Kiem station co id trung voi insert.id
+	for (int j = 0; j < pData->pStation.getSize(); j++) {
+		if (station_insert.id == pData->pStation[j].id) {
+			result[0] = pData->pStation[j].station_id;
+			break;
+		}
+	}
+	pOutput = result;
+	N = 1;
 }
 //Chèn nhà ga vào đường
 void Process_ISL(TDataset* pData, void*& pOutput, int station_id, int line_id, int pos, int& N) {
@@ -511,7 +568,12 @@ void Process_ISL(TDataset* pData, void*& pOutput, int station_id, int line_id, i
 		if (pData->pStation[i].line_id == line_id) index++;
 	}
 	
-	if (pos == 0) pData->pStation.insertHead(station); //Chen vao dau
+	if (pos == 0) {
+		pData->pStation.insertHead(station); //Chen vao dau
+		result[0] = 0;
+		pOutput = result;
+		N = 1;
+	}
 	else {
 		if (index == 0 && indexInsert == 0) { //Neu khong tim duoc vi tri
 			result[0] = -1;
@@ -533,9 +595,10 @@ void Process_US(TDataset* pData, void*& pOutput, int station_id, string decrepti
 	int index = 0;
 	int idOfStation = -1;
 	bool isFound = false;
+	//Tim id cua station co station_id
 	for (int i = 0; i < numOfStation; i++) {
 		if (station_id == pData->pStation[i].station_id) {
-			idOfStation = i;
+			idOfStation = pData->pStation[i].id;
 			isFound = true;
 			break;
 		}
