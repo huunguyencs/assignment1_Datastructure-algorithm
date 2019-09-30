@@ -34,6 +34,7 @@ void Initialization() {
 void Finalization() {
 	// Release your data before exiting
 	
+
 }
 
 void ProcessRequest(const char* pRequest, void* pData, void*& pOutput, int& N) {
