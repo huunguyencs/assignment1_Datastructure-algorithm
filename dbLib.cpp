@@ -105,9 +105,16 @@ void LoadData(void* &data) {
 	while (!FileIn.eof()) {
 		getline(FileIn, temp, ',');
 		track.track_id = atoi(temp.c_str());
-		getline(FileIn, temp, '(');
-		getline(FileIn, temp, ')');
-		pointInTrack(temp, track);
+		getline(FileIn, temp, 'L');
+		if (temp[0] == '\"') {
+			getline(FileIn, temp, '(');
+			getline(FileIn, temp, ')');
+			pointInTrack(temp, track);
+		}
+		else {
+			track.point->p1 = 0.00;
+			track.point->p2 = 0.00;
+		}
 		getline(FileIn, temp);
 		pData->pTrack.push_back(track);
 	}
@@ -118,6 +125,7 @@ void LoadData(void* &data) {
 }
 
 void ReleaseData(void*& data) {
+	data = NULL;
 	delete data;
 }
 Point creatPoint(string p_string) {
@@ -156,5 +164,4 @@ void pointInTrack(string point_array, TTrack& track) {
 		i++;
 	}
 }
-
 
